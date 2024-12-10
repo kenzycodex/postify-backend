@@ -1,19 +1,20 @@
-require('dotenv').config();
+import dotenv from 'dotenv';
+dotenv.config();
 
 const environmentConfig = {
   development: {
     database: {
       url: process.env.DEV_DATABASE_URL,
-      dialect: 'postgres'
+      dialect: 'postgres',
     },
     jwt: {
       secret: process.env.JWT_SECRET,
-      expiration: '7d'
+      expiration: '7d',
     },
     email: {
       host: process.env.EMAIL_HOST,
-      port: process.env.EMAIL_PORT
-    }
+      port: parseInt(process.env.EMAIL_PORT),
+    },
   },
   production: {
     database: {
@@ -23,20 +24,18 @@ const environmentConfig = {
         max: 20,
         min: 5,
         acquire: 30000,
-        idle: 10000
-      }
+        idle: 10000,
+      },
     },
     jwt: {
       secret: process.env.JWT_SECRET,
-      expiration: '30d'
-    }
-  }
+      expiration: '30d',
+    },
+  },
 };
 
-const getConfig = (env = 'development') => {
+const getConfig = (env = process.env.NODE_ENV || 'development') => {
   return environmentConfig[env] || environmentConfig.development;
 };
 
-module.exports = {
-  getConfig
-};
+export { getConfig };

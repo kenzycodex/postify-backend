@@ -1,38 +1,35 @@
-// src/config/database.js
-const { Sequelize } = require('sequelize');
+import { Sequelize } from 'sequelize';
+import logger from './logger';
 
+// Initialize Sequelize connection
 const sequelize = new Sequelize(process.env.DATABASE_URL, {
   dialect: 'postgres',
-  logging: false,
+  logging: false, // Disable SQL query logging
   pool: {
     max: 10,
     min: 0,
     acquire: 30000,
-    idle: 10000
+    idle: 10000,
   },
   define: {
     timestamps: true,
-    underscored: true
-  }
+    underscored: true,
+  },
 });
 
-// Connection and synchronization
+// Function to initialize and synchronize DB
 const initializeDatabase = async () => {
   try {
     await sequelize.authenticate();
-    console.log('Database connection established successfully.');
-    
-    // Sync models (use carefully in production)
-    await sequelize.sync({ 
-      // alter: true // Uncomment for development
-    });
+    logger.info('Database connection established successfully.');
+
+    // Sync models for development environments
+    await sequelize.sync({ alter: false });
+    logger.info('Database models synced successfully.');
   } catch (error) {
-    console.error('Unable to connect to the database:', error);
+    logger.error('Unable to connect to the database', error);
     process.exit(1);
   }
 };
 
-module.exports = {
-  sequelize,
-  initializeDatabase
-};
+export { sequelize, initializeDatabase };

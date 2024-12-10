@@ -40,23 +40,4 @@ app.use('/api/posts', postRoutes);
 // Global Error Handler
 app.use(errorHandler);
 
-// Database Connection
-const startServer = async () => {
-    try {
-      await sequelize.authenticate();
-      await sequelize.sync(); 
-      
-      const PORT = process.env.PORT || 3000;
-      app.listen(PORT, () => {
-        logger.info(`Server running on port ${PORT}`);
-      });
-    } catch (error) {
-      logger.error('Unable to start server:', error);
-      process.exit(1);
-    }
-  };
-},
-
-startServer();
-
 module.exports = app;
