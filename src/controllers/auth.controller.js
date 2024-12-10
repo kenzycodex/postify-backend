@@ -83,3 +83,59 @@ exports.login = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+
+// const { User } = require('../models');
+// const bcrypt = require('bcrypt');
+// const jwt = require('jsonwebtoken');
+// const crypto = require('crypto');
+// const emailService = require('../services/email.service');
+// const tokenService = require('../services/token.service');
+
+// class AuthController {
+//   async register(req, res) {
+//     try {
+//       const { username, email, password } = req.body;
+      
+//       // Check existing user
+//       const existingUser = await User.findOne({ 
+//         where: { 
+//           [Op.or]: [{ email }, { username }] 
+//         } 
+//       });
+      
+//       if (existingUser) {
+//         return res.status(400).json({ 
+//           error: 'User already exists' 
+//         });
+//       }
+
+//       // Generate verification token
+//       const verificationToken = crypto.randomBytes(32).toString('hex');
+
+//       // Create user
+//       const user = await User.create({
+//         username,
+//         email,
+//         password,
+//         verificationToken
+//       });
+
+//       // Send verification email
+//       await emailService.sendVerificationEmail(
+//         user.email, 
+//         verificationToken
+//       );
+
+//       res.status(201).json({ 
+//         message: 'Registration successful. Please verify your email.' 
+//       });
+//     } catch (error) {
+//       res.status(500).json({ error: error.message });
+//     }
+//   }
+
+//   // Other authentication methods similar to previous implementation
+// }
+
+// module.exports = new AuthController();

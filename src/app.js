@@ -3,8 +3,10 @@ const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
 const compression = require('compression');
-const { apiLimiter } = require('./middlewares/rate.limiter.middleware');
+const { sequelize } = require('./models');
 const errorHandler = require('./middlewares/error.middleware');
+const logger = require('./services/logger.service');
+const { apiLimiter } = require('./middlewares/rate.limiter.middleware');
 
 const app = express();
 
@@ -25,12 +27,36 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
+const authRoutes = require('./routes/auth.routes');
+const adminRoutes = require('./routes/admin.routes');
+const userRoutes = require('./routes/user.routes');
+const postRoutes = require('./routes/post.routes');
+
 app.use('/api/auth', authRoutes);
+app.use('/api/admin', adminRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/posts', postRoutes);
-app.use('/api/admin', adminRoutes);
 
 // Global Error Handler
 app.use(errorHandler);
+
+// Database Connection
+const startServer = async () => {
+    try {
+      await sequelize.authenticate();
+      await sequelize.sync(); 
+      
+      const PORT = process.env.PORT || 3000;
+      app.listen(PORT, () => {
+        logger.info(`Server running on port ${PORT}`);
+      });
+    } catch (error) {
+      logger.error('Unable to start server:', error);
+      process.exit(1);
+    }
+  };
+},
+
+startServer();
 
 module.exports = app;
