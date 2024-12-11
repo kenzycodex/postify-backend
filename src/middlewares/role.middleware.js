@@ -1,25 +1,22 @@
-const jwt = require('jsonwebtoken');
 const { User } = require('../models');
 
-const authMiddleware = async (req, res, next) => {
-  try {
-    const token = req.header('Authorization').replace('Bearer ', '');
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    
-    const user = await User.findByPk(decoded.id, {
-      attributes: { exclude: ['password'] }
-    });
+const roleMiddleware = (roles = []) => {
+  return async (req, res, next) => {
+    try {
+      if (!req.user) {
+        return res.status(401).send({ error: 'Unauthorized access' });
+      }
 
-    if (!user) {
-      throw new Error();
+      const hasRole = roles.includes(req.user.role);
+      if (!hasRole) {
+        return res.status(403).send({ error: 'You do not have permission to perform this action' });
+      }
+
+      next();
+    } catch (error) {
+      res.status(500).send({ error: 'Server Error' });
     }
-
-    req.token = token;
-    req.user = user;
-    next();
-  } catch (error) {
-    res.status(401).send({ error: 'Please authenticate' });
-  }
+  };
 };
 
-module.exports = authMiddleware;
+module.exports = roleMiddleware;
